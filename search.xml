@@ -124,114 +124,6 @@ C_0 = \frac{1}{\alpha(n)}, \quad C_k = \frac{(2^{n+1}nk)^k}{\alpha(n)}, \quad (k
       </tags>
   </entry>
   <entry>
-    <title>张量分解</title>
-    <url>/posts/e05ab48b.html</url>
-    <content><![CDATA[<p>张量又称多维数组，是矩阵的高维推广。与传统的矩阵（二维数据）不同，张量能够处理更高维度的数据，因此它是多维数据表示的理想工具。</p>
-<h2 id="张量的概念"><a href="#张量的概念" class="headerlink" title="张量的概念"></a>张量的概念</h2><div class="note info no-icon flat"><p><strong>定义 (张量):</strong><br>张量是一个多维数组，$d$ 阶张量是一个具有 $d$ 个维度的数组，表示为：</p>
-<script type="math/tex; mode=display">
-\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}</script></div>
-<p>下图展示了从标量到三阶张量的直观对比：</p>
-<div style="width: 60%; margin: 0 auto;">
-<img src="/posts/e05ab48b/Example_of_Tensors.png" class="" title="标量、向量、矩阵和三阶张量">
-</div>
-
-<h2 id="张量分解"><a href="#张量分解" class="headerlink" title="张量分解"></a>张量分解</h2><h3 id="Tucker-分解"><a href="#Tucker-分解" class="headerlink" title="Tucker 分解"></a>Tucker 分解</h3><p>张量分解是一种将高维张量分解为若干低维因子组合的技巧。其中一种为 <strong>Tucker 分解</strong>，它可以被视为张量的高阶主成分分析（PCA）。</p>
-<p>Tucker 分解的核心思想是将张量分解为<strong>核心张量</strong>与<strong>各模式因子矩阵</strong>的乘积。</p>
-<p>具体地，给定一个张量 $\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$，Tucker 分解表示为：</p>
-<div class="note success no-icon flat"><p><strong>Tucker Decomposition:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{X} \approx \mathcal{C} \times_1 Q^1 \times_2 Q^2 \cdots \times_d Q^d = \sum_{j_1=1}^{m_1} \sum_{j_2=1}^{m_2} \cdots \sum_{j_d=1}^{m_d} c_{j_1 j_2 \dots j_d} \, \mathbf{q}^{1}_{j_1} \circ \mathbf{q}^{2}_{j_2} \circ \cdots \circ \mathbf{q}^{d}_{j_d}</script></div>
-<p>其中：</p>
-<ul>
-<li>$\mathcal{C}\in \mathbb{R}^{m_1 \times m_2 \times \cdots \times m_d}$ 是 <strong>核心张量 (Core Tensor)</strong>，反映了不同模式之间的相互作用。</li>
-<li>$Q^{k} \in \mathbb{R}^{n_k \times m_k}$ 是 <strong>因子矩阵 (Factor Matrices)</strong>。</li>
-</ul>
-<div style="width: 60%; margin: 0 auto;">
-<img src="/posts/e05ab48b/Tucker.png" class="" title="Tucker分解示意图">
-</div>
-
-<h3 id="CP-分解"><a href="#CP-分解" class="headerlink" title="CP 分解"></a>CP 分解</h3><p>特别地，当 $m_{1} =m_{2} = \cdots =m_{d} = r$，且核心张量限制为<strong>对角型</strong>时，被称为 <strong>CP 分解</strong> (Canonical Polyadic Decomposition)。</p>
-<p>它将张量近似为一组<strong>秩为 1 的张量之和</strong>。具体而言，给定一个张量 $\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$，其分解形式为：</p>
-<div class="note success no-icon flat"><p><strong>CP Decomposition:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{X} \approx \sum_{j=1}^r \mathbf{p}_j^1 \circ \mathbf{p}_j^2 \circ \cdots \circ \mathbf{p}_j^d</script></div>
-<p>其中 $\mathbf{p}_j^k$ 为 $n_k$ 维向量（$k = 1, 2, \cdots, d$）。</p>
-<p><strong>优势：</strong> CP 分解将系数从 $p_{1}\times\cdots\times p_{d}$ 降低至 $r(p_{1} + p_{2} +\cdots +p_{d})$，提供了极高效的数据降维能力。</p>
-<p><strong>缺点：</strong> CP 分解的最优秩的确定是一个NP-hard 的问题，实际操作时难以实现。</p>
-<div style="width: 60%; margin: 0 auto;">
-<img src="/posts/e05ab48b/PARAFAC.png" class="" title="PARAFAC分解示意图">
-</div>
-
-<h3 id="TT-分解"><a href="#TT-分解" class="headerlink" title="TT 分解"></a>TT 分解</h3><p><strong>TT分解的核心思想</strong></p>
-<ul>
-<li>假设模态的排序具有某种语义相关性。</li>
-<li>将高阶张量 $\mathcal{A}$ 近似为一串 3 阶张量的链式乘积。</li>
-</ul>
-<div class="note success no-icon flat"><p><strong>TT Decomposition:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{A}(i_1, \dots, i_d) = \sum_{\alpha_0=1}^{r_0} \cdots \sum_{\alpha_d=1}^{r_d} \mathcal{G}_1(\alpha_0, i_1, \alpha_1) \mathcal{G}_2(\alpha_1, i_2, \alpha_2) \cdots \mathcal{G}_d(\alpha_{d-1}, i_d, \alpha_d)</script></div>
-<p>其中 $\mathcal{G}_k \in \mathbb{R}^{r_{k-1} \times n_k \times r_k}$。$r_k$ 称为 <strong>TT-秩 (TT-rank)</strong>，且满足边界条件 $r_0 = r_d = 1$。</p>
-<div style="width: 60%; margin: 0 auto;">
-  <img src="/posts/e05ab48b/TT.png" class="" title="TT分解示意图">
-</div>
-
-<p><strong>优势：</strong> TT分解的好处在于随着张量阶数提升，分解后的形式仅仅是在已有分解的基础上在后面加上几节“车厢”，而相比之下Tucker分解的核心张量参数量仍是指数阶的。</p>
-<p><strong>不足：</strong> 然而，TT分解高度依赖于张量维度的排列，这导致难以找到最佳的TT表示。</p>
-<h3 id="TR-分解"><a href="#TR-分解" class="headerlink" title="TR 分解"></a>TR 分解</h3><p>TR 分解将高阶张量 $\mathcal{T}$ 表示为一系列三阶核心张量的<strong>循环</strong>矩阵乘积的迹。它可以看作是 TT 分解的推广（当首尾秩为 1 时退化为 TT），也可以看作是首尾相连的“环状”结构。</p>
-<div class="note success no-icon flat"><p><strong>TR Decomposition:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{T}(i_1, i_2, \dots, i_d) = \text{Tr} \left( \mathbf{Z}_1(i_1) \mathbf{Z}_2(i_2) \cdots \mathbf{Z}_d(i_d) \right) = \text{Tr} \left( \prod_{k=1}^d \mathbf{Z}_k(i_k) \right)</script></div>
-<p>其中 $\mathcal{Z}_k \in \mathbb{R}^{r_k \times n_k \times r_{k+1}}$ 为第 $k$ 个核心张量，$\mathbf{Z}_k(i_k)$ 表示核心张量 $\mathcal{Z}_k$ 的第 $i_k$ 个侧切片矩阵（大小为 $r_k \times r_{k+1}$）。</p>
-<p>这里的 $\mathbf{r} = [r_1, r_2, \cdots, r_d]^{\text{T}}$ 被称为TR秩。</p>
-<div style="width: 60%; margin: 0 auto;">
-  <img src="/posts/e05ab48b/TR.png" class="" title="TR分解示意图">
-</div>
-
-<p>如果我们把迹运算展开，就可以得到索引形式的TR分解。</p>
-<div class="note success no-icon flat"><p><strong>TR Decomposition in Index Form:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{T}(i_1, \dots, i_d) = \sum_{\alpha_1=1}^{r_1} \cdots \sum_{\alpha_d=1}^{r_d} \prod_{k=1}^{d} \mathcal{Z}_k(\alpha_k, i_k, \alpha_{k+1})</script></div>
-<p>注意这里隐含了条件 $\alpha_{d+1} = \alpha_1$。这个公式直观地展示了每一个张量元素是如何通过核心张量中的元素相乘并求和得到的。</p>
-<p>更进一步，我们可以将 TR 分解理解为一系列由 $d$ 个向量外积产生的 <strong>秩-1 张量 (Rank-1 Tensors)</strong> 之和。</p>
-<div class="note success no-icon flat"><p><strong>TR Decomposition in the Tensor Form:</strong></p>
-<script type="math/tex; mode=display">
-\mathcal{T} = \sum_{\alpha_1=1}^{r_1} \cdots \sum_{\alpha_d=1}^{r_d} \mathbf{z}_1(\alpha_1, \alpha_2) \circ \mathbf{z}_2(\alpha_2, \alpha_3) \circ \cdots \circ \mathbf{z}_d(\alpha_d, \alpha_1)</script></div>
-<p>其中：</p>
-<ul>
-<li>符号 $\circ$ 表示向量的外积。</li>
-<li>$\mathbf{z}_k(\alpha_k, \alpha_{k+1})$ 表示核心张量 $\mathcal{Z}_k$ 的<strong>第 $(\alpha_k, \alpha_{k+1})$ 根 mode-2 纤维 (Fiber)</strong>（即固定了前后两个秩索引后，剩下的那个长度为 $n_k$ 的向量）。</li>
-</ul>
-<p>由此可见，通过TR分解可以将参数量从 $\mathcal{O}(n^d)$降低至 $\mathcal{O}(dnr^2)$.</p>
-<p>TR 分解最显著的一个性质是其对张量维度的循环移位具有不变性。这一点将 TR 与 TT 分解严格区分开来。</p>
-<div class="note primary no-icon flat"><p><strong>Theorem 1 (Circular Dimensional Permutation Invariance)</strong></p>
-<p>令 $\mathcal{T} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$ 为一个 $d$ 阶张量，其 TR 分解表示为 $\mathcal{T} = \mathfrak{R}(\mathcal{Z}_1, \mathcal{Z}_2, \dots, \mathcal{Z}_d)$。</p>
-<p>如果我们定义 $\overrightarrow{\mathcal{T}}^{k}$ 为将 $\mathcal{T}$ 的维度<strong>循环右移</strong> $k$ 次后得到的新张量，$\overrightarrow{\mathcal{T}}^{k}\in\mathbb{R}^{n_{k+1} \times \cdots \times n_d \times n_1 \times \cdots \times n_k}$，那么 $\overrightarrow{\mathcal{T}}^{k}$ 的 TR 分解核心张量序列仅需做同样的循环移位：</p>
-<script type="math/tex; mode=display">
-\overrightarrow{\mathcal{T}}^{k} = \mathfrak{R}(\mathcal{Z}_{k+1}, \dots, \mathcal{Z}_d, \mathcal{Z}_1, \dots, \mathcal{Z}_k)</script></div>
-<p><strong>证明:</strong></p>
-<p>这一性质的证明直接依赖于矩阵迹运算的循环性质 $\text{Tr}(\mathbf{A}\mathbf{B}) = \text{Tr}(\mathbf{B}\mathbf{A})$。</p>
-<p>根据 TR 分解的定义公式 (1)，我们可以将其重写为：</p>
-<script type="math/tex; mode=display">
-\begin{aligned}
-\mathcal{T}(i_1, i_2, \dots, i_d) &= \text{Tr}(\mathbf{Z}_1(i_1) \mathbf{Z}_2(i_2) \cdots \mathbf{Z}_d(i_d)) \\
-&= \text{Tr}(\mathbf{Z}_2(i_2) \mathbf{Z}_3(i_3) \cdots \mathbf{Z}_d(i_d) \mathbf{Z}_1(i_1)) \\
-&\quad \vdots \\
-&= \text{Tr}(\mathbf{Z}_{k+1}(i_{k+1}) \cdots \mathbf{Z}_d(i_d) \mathbf{Z}_1(i_1) \cdots \mathbf{Z}_k(i_k))
-\end{aligned}</script><p>这表明，如果我们改变张量维度的物理顺序（例如将前 $k$ 个维度移到末尾），我们只需要相应地循环移动核心张量的顺序，而不需要重新计算核心张量的值。</p>
-]]></content>
-      <categories>
-        <category>统计机器学习</category>
-      </categories>
-      <tags>
-        <tag>毕业论文</tag>
-        <tag>CP 分解</tag>
-        <tag>Tucker 分解</tag>
-        <tag>TT 分解</tag>
-        <tag>TR 分解</tag>
-        <tag>张量</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Transformed LoRA via Tensor Decomposition</title>
     <url>/posts/41219a96.html</url>
     <content><![CDATA[<p>此篇博客来源于毕设课题的参考文献，复现论文<a href="https://arxiv.org/abs/2501.08727">Transformed Low-rank Adaptation via Tensor Decomposition and Its Applications to Text-to-image Models</a>，将简要记录论文第三节提出的模型。</p>
@@ -399,6 +291,114 @@ C_0 = \frac{1}{\alpha(n)}, \quad C_k = \frac{(2^{n+1}nk)^k}{\alpha(n)}, \quad (k
         <tag>TR 分解</tag>
         <tag>张量</tag>
         <tag>论文复现</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>张量分解</title>
+    <url>/posts/e05ab48b.html</url>
+    <content><![CDATA[<p>张量又称多维数组，是矩阵的高维推广。与传统的矩阵（二维数据）不同，张量能够处理更高维度的数据，因此它是多维数据表示的理想工具。</p>
+<h2 id="张量的概念"><a href="#张量的概念" class="headerlink" title="张量的概念"></a>张量的概念</h2><div class="note info no-icon flat"><p><strong>定义 (张量):</strong><br>张量是一个多维数组，$d$ 阶张量是一个具有 $d$ 个维度的数组，表示为：</p>
+<script type="math/tex; mode=display">
+\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}</script></div>
+<p>下图展示了从标量到三阶张量的直观对比：</p>
+<div style="width: 60%; margin: 0 auto;">
+<img src="/posts/e05ab48b/Example_of_Tensors.png" class="" title="标量、向量、矩阵和三阶张量">
+</div>
+
+<h2 id="张量分解"><a href="#张量分解" class="headerlink" title="张量分解"></a>张量分解</h2><h3 id="Tucker-分解"><a href="#Tucker-分解" class="headerlink" title="Tucker 分解"></a>Tucker 分解</h3><p>张量分解是一种将高维张量分解为若干低维因子组合的技巧。其中一种为 <strong>Tucker 分解</strong>，它可以被视为张量的高阶主成分分析（PCA）。</p>
+<p>Tucker 分解的核心思想是将张量分解为<strong>核心张量</strong>与<strong>各模式因子矩阵</strong>的乘积。</p>
+<p>具体地，给定一个张量 $\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$，Tucker 分解表示为：</p>
+<div class="note success no-icon flat"><p><strong>Tucker Decomposition:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{X} \approx \mathcal{C} \times_1 Q^1 \times_2 Q^2 \cdots \times_d Q^d = \sum_{j_1=1}^{m_1} \sum_{j_2=1}^{m_2} \cdots \sum_{j_d=1}^{m_d} c_{j_1 j_2 \dots j_d} \, \mathbf{q}^{1}_{j_1} \circ \mathbf{q}^{2}_{j_2} \circ \cdots \circ \mathbf{q}^{d}_{j_d}</script></div>
+<p>其中：</p>
+<ul>
+<li>$\mathcal{C}\in \mathbb{R}^{m_1 \times m_2 \times \cdots \times m_d}$ 是 <strong>核心张量 (Core Tensor)</strong>，反映了不同模式之间的相互作用。</li>
+<li>$Q^{k} \in \mathbb{R}^{n_k \times m_k}$ 是 <strong>因子矩阵 (Factor Matrices)</strong>。</li>
+</ul>
+<div style="width: 60%; margin: 0 auto;">
+<img src="/posts/e05ab48b/Tucker.png" class="" title="Tucker分解示意图">
+</div>
+
+<h3 id="CP-分解"><a href="#CP-分解" class="headerlink" title="CP 分解"></a>CP 分解</h3><p>特别地，当 $m_{1} =m_{2} = \cdots =m_{d} = r$，且核心张量限制为<strong>对角型</strong>时，被称为 <strong>CP 分解</strong> (Canonical Polyadic Decomposition)。</p>
+<p>它将张量近似为一组<strong>秩为 1 的张量之和</strong>。具体而言，给定一个张量 $\mathcal{X} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$，其分解形式为：</p>
+<div class="note success no-icon flat"><p><strong>CP Decomposition:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{X} \approx \sum_{j=1}^r \mathbf{p}_j^1 \circ \mathbf{p}_j^2 \circ \cdots \circ \mathbf{p}_j^d</script></div>
+<p>其中 $\mathbf{p}_j^k$ 为 $n_k$ 维向量（$k = 1, 2, \cdots, d$）。</p>
+<p><strong>优势：</strong> CP 分解将系数从 $p_{1}\times\cdots\times p_{d}$ 降低至 $r(p_{1} + p_{2} +\cdots +p_{d})$，提供了极高效的数据降维能力。</p>
+<p><strong>缺点：</strong> CP 分解的最优秩的确定是一个NP-hard 的问题，实际操作时难以实现。</p>
+<div style="width: 60%; margin: 0 auto;">
+<img src="/posts/e05ab48b/PARAFAC.png" class="" title="PARAFAC分解示意图">
+</div>
+
+<h3 id="TT-分解"><a href="#TT-分解" class="headerlink" title="TT 分解"></a>TT 分解</h3><p><strong>TT分解的核心思想</strong></p>
+<ul>
+<li>假设模态的排序具有某种语义相关性。</li>
+<li>将高阶张量 $\mathcal{A}$ 近似为一串 3 阶张量的链式乘积。</li>
+</ul>
+<div class="note success no-icon flat"><p><strong>TT Decomposition:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{A}(i_1, \dots, i_d) = \sum_{\alpha_0=1}^{r_0} \cdots \sum_{\alpha_d=1}^{r_d} \mathcal{G}_1(\alpha_0, i_1, \alpha_1) \mathcal{G}_2(\alpha_1, i_2, \alpha_2) \cdots \mathcal{G}_d(\alpha_{d-1}, i_d, \alpha_d)</script></div>
+<p>其中 $\mathcal{G}_k \in \mathbb{R}^{r_{k-1} \times n_k \times r_k}$。$r_k$ 称为 <strong>TT-秩 (TT-rank)</strong>，且满足边界条件 $r_0 = r_d = 1$。</p>
+<div style="width: 60%; margin: 0 auto;">
+  <img src="/posts/e05ab48b/TT.png" class="" title="TT分解示意图">
+</div>
+
+<p><strong>优势：</strong> TT分解的好处在于随着张量阶数提升，分解后的形式仅仅是在已有分解的基础上在后面加上几节“车厢”，而相比之下Tucker分解的核心张量参数量仍是指数阶的。</p>
+<p><strong>不足：</strong> 然而，TT分解高度依赖于张量维度的排列，这导致难以找到最佳的TT表示。</p>
+<h3 id="TR-分解"><a href="#TR-分解" class="headerlink" title="TR 分解"></a>TR 分解</h3><p>TR 分解将高阶张量 $\mathcal{T}$ 表示为一系列三阶核心张量的<strong>循环</strong>矩阵乘积的迹。它可以看作是 TT 分解的推广（当首尾秩为 1 时退化为 TT），也可以看作是首尾相连的“环状”结构。</p>
+<div class="note success no-icon flat"><p><strong>TR Decomposition:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{T}(i_1, i_2, \dots, i_d) = \text{Tr} \left( \mathbf{Z}_1(i_1) \mathbf{Z}_2(i_2) \cdots \mathbf{Z}_d(i_d) \right) = \text{Tr} \left( \prod_{k=1}^d \mathbf{Z}_k(i_k) \right)</script></div>
+<p>其中 $\mathcal{Z}_k \in \mathbb{R}^{r_k \times n_k \times r_{k+1}}$ 为第 $k$ 个核心张量，$\mathbf{Z}_k(i_k)$ 表示核心张量 $\mathcal{Z}_k$ 的第 $i_k$ 个侧切片矩阵（大小为 $r_k \times r_{k+1}$）。</p>
+<p>这里的 $\mathbf{r} = [r_1, r_2, \cdots, r_d]^{\text{T}}$ 被称为TR秩。</p>
+<div style="width: 60%; margin: 0 auto;">
+  <img src="/posts/e05ab48b/TR.png" class="" title="TR分解示意图">
+</div>
+
+<p>如果我们把迹运算展开，就可以得到索引形式的TR分解。</p>
+<div class="note success no-icon flat"><p><strong>TR Decomposition in Index Form:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{T}(i_1, \dots, i_d) = \sum_{\alpha_1=1}^{r_1} \cdots \sum_{\alpha_d=1}^{r_d} \prod_{k=1}^{d} \mathcal{Z}_k(\alpha_k, i_k, \alpha_{k+1})</script></div>
+<p>注意这里隐含了条件 $\alpha_{d+1} = \alpha_1$。这个公式直观地展示了每一个张量元素是如何通过核心张量中的元素相乘并求和得到的。</p>
+<p>更进一步，我们可以将 TR 分解理解为一系列由 $d$ 个向量外积产生的 <strong>秩-1 张量 (Rank-1 Tensors)</strong> 之和。</p>
+<div class="note success no-icon flat"><p><strong>TR Decomposition in the Tensor Form:</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{T} = \sum_{\alpha_1=1}^{r_1} \cdots \sum_{\alpha_d=1}^{r_d} \mathbf{z}_1(\alpha_1, \alpha_2) \circ \mathbf{z}_2(\alpha_2, \alpha_3) \circ \cdots \circ \mathbf{z}_d(\alpha_d, \alpha_1)</script></div>
+<p>其中：</p>
+<ul>
+<li>符号 $\circ$ 表示向量的外积。</li>
+<li>$\mathbf{z}_k(\alpha_k, \alpha_{k+1})$ 表示核心张量 $\mathcal{Z}_k$ 的<strong>第 $(\alpha_k, \alpha_{k+1})$ 根 mode-2 纤维 (Fiber)</strong>（即固定了前后两个秩索引后，剩下的那个长度为 $n_k$ 的向量）。</li>
+</ul>
+<p>由此可见，通过TR分解可以将参数量从 $\mathcal{O}(n^d)$降低至 $\mathcal{O}(dnr^2)$.</p>
+<p>TR 分解最显著的一个性质是其对张量维度的循环移位具有不变性。这一点将 TR 与 TT 分解严格区分开来。</p>
+<div class="note primary no-icon flat"><p><strong>Theorem 1 (Circular Dimensional Permutation Invariance)</strong></p>
+<p>令 $\mathcal{T} \in \mathbb{R}^{n_1 \times n_2 \times \cdots \times n_d}$ 为一个 $d$ 阶张量，其 TR 分解表示为 $\mathcal{T} = \mathfrak{R}(\mathcal{Z}_1, \mathcal{Z}_2, \dots, \mathcal{Z}_d)$。</p>
+<p>如果我们定义 $\overrightarrow{\mathcal{T}}^{k}$ 为将 $\mathcal{T}$ 的维度<strong>循环右移</strong> $k$ 次后得到的新张量，$\overrightarrow{\mathcal{T}}^{k}\in\mathbb{R}^{n_{k+1} \times \cdots \times n_d \times n_1 \times \cdots \times n_k}$，那么 $\overrightarrow{\mathcal{T}}^{k}$ 的 TR 分解核心张量序列仅需做同样的循环移位：</p>
+<script type="math/tex; mode=display">
+\overrightarrow{\mathcal{T}}^{k} = \mathfrak{R}(\mathcal{Z}_{k+1}, \dots, \mathcal{Z}_d, \mathcal{Z}_1, \dots, \mathcal{Z}_k)</script></div>
+<p><strong>证明:</strong></p>
+<p>这一性质的证明直接依赖于矩阵迹运算的循环性质 $\text{Tr}(\mathbf{A}\mathbf{B}) = \text{Tr}(\mathbf{B}\mathbf{A})$。</p>
+<p>根据 TR 分解的定义公式 (1)，我们可以将其重写为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathcal{T}(i_1, i_2, \dots, i_d) &= \text{Tr}(\mathbf{Z}_1(i_1) \mathbf{Z}_2(i_2) \cdots \mathbf{Z}_d(i_d)) \\
+&= \text{Tr}(\mathbf{Z}_2(i_2) \mathbf{Z}_3(i_3) \cdots \mathbf{Z}_d(i_d) \mathbf{Z}_1(i_1)) \\
+&\quad \vdots \\
+&= \text{Tr}(\mathbf{Z}_{k+1}(i_{k+1}) \cdots \mathbf{Z}_d(i_d) \mathbf{Z}_1(i_1) \cdots \mathbf{Z}_k(i_k))
+\end{aligned}</script><p>这表明，如果我们改变张量维度的物理顺序（例如将前 $k$ 个维度移到末尾），我们只需要相应地循环移动核心张量的顺序，而不需要重新计算核心张量的值。</p>
+]]></content>
+      <categories>
+        <category>统计机器学习</category>
+      </categories>
+      <tags>
+        <tag>毕业论文</tag>
+        <tag>TR 分解</tag>
+        <tag>张量</tag>
+        <tag>CP 分解</tag>
+        <tag>Tucker 分解</tag>
+        <tag>TT 分解</tag>
       </tags>
   </entry>
 </search>
